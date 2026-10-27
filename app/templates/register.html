@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Register - SDRN</title>
+</head>
+<body>
+  <main>
+    <h1>Create an SDRN account</h1>
+    <p><em>Temporary unstyled page. Replaced in Phase 4.</em></p>
+
+    <form method="post" action="{{ url_for('auth.register') }}" novalidate>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+      <p>
+        <label for="full_name">Full name</label><br>
+        <input id="full_name" name="full_name" type="text" autocomplete="name" required
+               maxlength="100" value="{{ form.get('full_name', '') }}">
+        {% if errors.get('full_name') %}<br><span role="alert">{{ errors['full_name'] }}</span>{% endif %}
+      </p>
+
+      <p>
+        <label for="email">Email</label><br>
+        <input id="email" name="email" type="email" autocomplete="email" required
+               value="{{ form.get('email', '') }}">
+        {% if errors.get('email') %}<br><span role="alert">{{ errors['email'] }}</span>{% endif %}
+      </p>
+
+      <p>
+        <label for="role">I am registering as a</label><br>
+        <select id="role" name="role" required>
+          <option value="citizen" {% if form.get('role', 'citizen') == 'citizen' %}selected{% endif %}>Citizen</option>
+          <option value="volunteer" {% if form.get('role') == 'volunteer' %}selected{% endif %}>Volunteer</option>
+        </select>
+        {% if errors.get('role') %}<br><span role="alert">{{ errors['role'] }}</span>{% endif %}
+      </p>
+
+      <p>
+        <label for="password">Password (8+ characters, with a letter and a number)</label><br>
+        <input id="password" name="password" type="password" autocomplete="new-password" required>
+        {% if errors.get('password') %}<br><span role="alert">{{ errors['password'] }}</span>{% endif %}
+      </p>
+
+      <p>
+        <label for="confirm_password">Confirm password</label><br>
+        <input id="confirm_password" name="confirm_password" type="password" autocomplete="new-password" required>
+        {% if errors.get('confirm_password') %}<br><span role="alert">{{ errors['confirm_password'] }}</span>{% endif %}
+      </p>
+
+      <button type="submit">Register</button>
+    </form>
+
+    <p>Already registered? <a href="{{ url_for('auth.login') }}">Log in</a></p>
+    <p><small>Academic prototype. Not monitored for real emergencies. Do not rely on it to get emergency help.</small></p>
+  </main>
+</body>
+</html>
