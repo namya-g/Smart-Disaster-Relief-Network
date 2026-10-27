@@ -6,8 +6,11 @@ from flask_wtf.csrf import CSRFError
 from jinja2 import TemplateNotFound
 
 from . import cli, db
+from .api import api_bp
+from .auth import auth_bp
 from .config import Config
 from .extensions import csrf, login_manager
+from .pages import pages_bp
 
 
 def create_app(test_config=None):
@@ -31,6 +34,10 @@ def create_app(test_config=None):
     csrf.init_app(app)
     login_manager.init_app(app)
 
+    app.register_blueprint(pages_bp)
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(api_bp)
+
     register_error_handlers(app)
 
     @app.after_request
@@ -48,8 +55,6 @@ def create_app(test_config=None):
         ).fetchone()
         return jsonify({"data": {"status": "ok", "database_initialised": row["n"] == 1}})
 
-    # Blueprints (auth, pages, api) are registered here in later phases.
-
     return app
 
 
@@ -60,7 +65,7 @@ def register_error_handlers(app):
         try:
             return render_template(template), status
         except TemplateNotFound:
-            # Templates arrive in Phase 4; plain text until then.
+            # Styled error pages arrive in Phase 4; plain text until then.
             return message, status
 
     @app.errorhandler(CSRFError)
