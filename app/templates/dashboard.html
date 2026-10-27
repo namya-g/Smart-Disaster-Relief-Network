@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard - SDRN</title>
+</head>
+<body>
+  <main>
+    <h1>Dashboard</h1>
+    <p><em>Temporary page. Replaced in Phase 9.</em></p>
+    <p>Logged in as {{ current_user.full_name }} ({{ current_user.role }}).</p>
+    <form method="post" action="{{ url_for('auth.logout') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit">Log out</button>
+    </form>
+  </main>
+</body>
+</html>
