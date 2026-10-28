@@ -1,58 +1,38 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Register - SDRN</title>
-</head>
-<body>
-  <main>
-    <h1>Create an SDRN account</h1>
-    <p><em>Temporary unstyled page. Replaced in Phase 4.</em></p>
+{% extends "_layout_auth.html" %}
+{% from "_macros.html" import field, password_field, select_field %}
 
-    <form method="post" action="{{ url_for('auth.register') }}" novalidate>
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+{% block title %}Create an account - SDRN{% endblock %}
 
-      <p>
-        <label for="full_name">Full name</label><br>
-        <input id="full_name" name="full_name" type="text" autocomplete="name" required
-               maxlength="100" value="{{ form.get('full_name', '') }}">
-        {% if errors.get('full_name') %}<br><span role="alert">{{ errors['full_name'] }}</span>{% endif %}
-      </p>
+{% block content %}
+  <h1 class="auth-card__title">Create an account</h1>
+  <p class="auth-card__intro">Register as a citizen or a volunteer.</p>
+  <p class="form-legend">Fields marked <span class="field__asterisk" aria-hidden="true">*</span><span class="sr-only">with an asterisk</span> are required.</p>
 
-      <p>
-        <label for="email">Email</label><br>
-        <input id="email" name="email" type="email" autocomplete="email" required
-               value="{{ form.get('email', '') }}">
-        {% if errors.get('email') %}<br><span role="alert">{{ errors['email'] }}</span>{% endif %}
-      </p>
+  <form method="post" action="{{ url_for('auth.register') }}" novalidate data-loading-form>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-      <p>
-        <label for="role">I am registering as a</label><br>
-        <select id="role" name="role" required>
-          <option value="citizen" {% if form.get('role', 'citizen') == 'citizen' %}selected{% endif %}>Citizen</option>
-          <option value="volunteer" {% if form.get('role') == 'volunteer' %}selected{% endif %}>Volunteer</option>
-        </select>
-        {% if errors.get('role') %}<br><span role="alert">{{ errors['role'] }}</span>{% endif %}
-      </p>
+    {{ field('full_name', 'full_name', 'Full name', value=form.get('full_name', ''),
+             autocomplete='name', maxlength=100, error=errors.get('full_name')) }}
 
-      <p>
-        <label for="password">Password (8+ characters, with a letter and a number)</label><br>
-        <input id="password" name="password" type="password" autocomplete="new-password" required>
-        {% if errors.get('password') %}<br><span role="alert">{{ errors['password'] }}</span>{% endif %}
-      </p>
+    {{ field('email', 'email', 'Email address', type='email', value=form.get('email', ''),
+             autocomplete='email', maxlength=254, error=errors.get('email'),
+             autocapitalize='off', spellcheck='false') }}
 
-      <p>
-        <label for="confirm_password">Confirm password</label><br>
-        <input id="confirm_password" name="confirm_password" type="password" autocomplete="new-password" required>
-        {% if errors.get('confirm_password') %}<br><span role="alert">{{ errors['confirm_password'] }}</span>{% endif %}
-      </p>
+    {{ select_field('role', 'role', 'Register as',
+                    [('citizen', 'Citizen - I may need help'), ('volunteer', 'Volunteer - I can help')],
+                    selected=form.get('role', 'citizen'),
+                    hint='Volunteers only see requests that an administrator assigns to them. Administrator accounts cannot be created here.',
+                    error=errors.get('role')) }}
 
-      <button type="submit">Register</button>
-    </form>
+    {{ password_field('password', 'password', 'Password', autocomplete='new-password',
+                      hint='At least 8 characters, including a letter and a number.',
+                      error=errors.get('password')) }}
 
-    <p>Already registered? <a href="{{ url_for('auth.login') }}">Log in</a></p>
-    <p><small>Academic prototype. Not monitored for real emergencies. Do not rely on it to get emergency help.</small></p>
-  </main>
-</body>
-</html>
+    {{ password_field('confirm_password', 'confirm_password', 'Confirm password',
+                      autocomplete='new-password', error=errors.get('confirm_password')) }}
+
+    <button type="submit" class="btn btn--primary btn--block" data-loading-text="Creating account&hellip;">Create account</button>
+  </form>
+
+  <p class="auth-card__switch">Already registered? <a href="{{ url_for('auth.login') }}">Log in</a></p>
+{% endblock %}
