@@ -4,7 +4,10 @@ from datetime import datetime, timezone
 from flask_login import UserMixin
 
 from .db import get_db, transaction
-from .validation import MAX_SQLITE_INT
+from .permissions import ROLES
+from .validation import MAX_SQLITE_INT, PRIORITIES, STATUSES
+
+OPEN_STATUSES = ("pending", "approved", "assigned", "in_progress")
 
 
 def utc_now():
@@ -81,6 +84,17 @@ def get_active_volunteer(user_id):
     ).fetchone()
 
 
+def count_users_by_role():
+    """Active users per role, zero-filled."""
+    counts = {role: 0 for role in ROLES}
+    rows = get_db().execute(
+        "SELECT role, COUNT(*) AS n FROM users WHERE is_active = 1 GROUP BY role"
+    ).fetchall()
+    for row in rows:
+        counts[row["role"]] = row["n"]
+    return counts
+
+
 # ---- Help requests ------------------------------------------------------------
 
 _REQUEST_SELECT = (
@@ -89,6 +103,28 @@ _REQUEST_SELECT = (
     "JOIN users c ON c.id = r.created_by "
     "LEFT JOIN users v ON v.id = r.assigned_volunteer_id"
 )
+
+_ORDERS = {
+    "newest": "r.created_at DESC, r.id DESC",
+    "oldest": "r.created_at ASC, r.id ASC",
+    "recently_updated": "r.updated_at DESC, r.id DESC",
+}
+
+
+def _visibility(user):
+    """The single rule for which help_requests rows (alias r) a user may see.
+    Returns (where_fragments, params)."""
+    if user.role == "administrator":
+        return [], []
+    if user.role == "citizen":
+        return ["r.created_by = ?"], [user.id]
+    if user.role == "volunteer":
+        return ["r.assigned_volunteer_id = ?"], [user.id]
+    return ["1 = 0"], []
+
+
+def _where_sql(fragments):
+    return (" WHERE " + " AND ".join(fragments)) if fragments else ""
 
 
 def get_request(request_id):
@@ -113,15 +149,7 @@ def _escape_like(text):
 
 def list_requests(user, filters):
     """Return (rows, total) of the requests this user may see, newest first."""
-    where, params = [], []
-    if user.role == "citizen":
-        where.append("r.created_by = ?")
-        params.append(user.id)
-    elif user.role == "volunteer":
-        where.append("r.assigned_volunteer_id = ?")
-        params.append(user.id)
-    elif user.role != "administrator":
-        where.append("1 = 0")
+    where, params = _visibility(user)
 
     if filters.get("status"):
         where.append("r.status = ?")
@@ -137,16 +165,56 @@ def list_requests(user, filters):
         )
         params.extend([pattern, pattern, pattern])
 
-    where_sql = (" WHERE " + " AND ".join(where)) if where else ""
+    where_sql = _where_sql(where)
     db = get_db()
     total = db.execute(
         "SELECT COUNT(*) AS n FROM help_requests r" + where_sql, params
     ).fetchone()["n"]
     rows = db.execute(
-        _REQUEST_SELECT + where_sql + " ORDER BY r.created_at DESC, r.id DESC LIMIT ? OFFSET ?",
+        _REQUEST_SELECT + where_sql + " ORDER BY " + _ORDERS["newest"] + " LIMIT ? OFFSET ?",
         params + [filters.get("limit", 50), filters.get("offset", 0)],
     ).fetchall()
     return rows, total
+
+
+def fetch_requests(user, statuses=None, order="newest", limit=5):
+    """A short list of visible requests, optionally limited to some statuses.
+    order is one of: newest, oldest, recently_updated (internal use only)."""
+    where, params = _visibility(user)
+    if statuses:
+        where.append("r.status IN (" + ",".join("?" for _ in statuses) + ")")
+        params.extend(statuses)
+    return get_db().execute(
+        _REQUEST_SELECT + _where_sql(where) + " ORDER BY " + _ORDERS[order] + " LIMIT ?",
+        params + [limit],
+    ).fetchall()
+
+
+def count_requests_by_status(user):
+    """Visible requests per status, zero-filled for every status."""
+    where, params = _visibility(user)
+    rows = get_db().execute(
+        "SELECT r.status AS status, COUNT(*) AS n FROM help_requests r"
+        + _where_sql(where) + " GROUP BY r.status",
+        params,
+    ).fetchall()
+    counts = {status: 0 for status in STATUSES}
+    for row in rows:
+        counts[row["status"]] = row["n"]
+    return counts
+
+
+def count_open_requests_by_priority():
+    """All still-open requests per self-reported priority (administrators only)."""
+    rows = get_db().execute(
+        "SELECT priority, COUNT(*) AS n FROM help_requests "
+        "WHERE status IN (" + ",".join("?" for _ in OPEN_STATUSES) + ") GROUP BY priority",
+        OPEN_STATUSES,
+    ).fetchall()
+    counts = {priority: 0 for priority in PRIORITIES}
+    for row in rows:
+        counts[row["priority"]] = row["n"]
+    return counts
 
 
 def create_request(user_id, data):
@@ -205,3 +273,25 @@ def assign_request(request_id, volunteer_id, changed_by, note=None):
             (request_id, changed_by, note),
         )
         return True
+
+
+# ---- Shelter and resource summaries (full CRUD arrives in Phase 7) -----------------
+
+def count_shelters():
+    """Totals over all shelter records: total, open (status = 'open'), demo."""
+    row = get_db().execute(
+        "SELECT COUNT(*) AS total, "
+        "COALESCE(SUM(CASE WHEN status = 'open' THEN 1 ELSE 0 END), 0) AS open, "
+        "COALESCE(SUM(is_demo), 0) AS demo FROM shelters"
+    ).fetchone()
+    return {"total": row["total"], "open": row["open"], "demo": row["demo"]}
+
+
+def count_resources():
+    """Totals over all resource records: total, available (status = 'available'), demo."""
+    row = get_db().execute(
+        "SELECT COUNT(*) AS total, "
+        "COALESCE(SUM(CASE WHEN status = 'available' THEN 1 ELSE 0 END), 0) AS available, "
+        "COALESCE(SUM(is_demo), 0) AS demo FROM resources"
+    ).fetchone()
+    return {"total": row["total"], "available": row["available"], "demo": row["demo"]}
