@@ -59,38 +59,46 @@ def create_app(test_config=None):
 
 
 def register_error_handlers(app):
-    def respond(status, code, message, template):
+    def respond(status, code, title, message, template):
+        """JSON for /api/... requests, an HTML error page for everything else."""
         if request.path.startswith("/api/"):
             return jsonify({"error": {"code": code, "message": message}}), status
         try:
-            return render_template(template), status
+            return render_template(template, error_status=status,
+                                   error_title=title, error_message=message), status
         except TemplateNotFound:
-            # Styled error pages arrive in Phase 4; plain text until then.
             return message, status
 
     @app.errorhandler(CSRFError)
     def csrf_error(error):
-        return respond(400, "csrf_failed",
-                       "Your session token is missing or expired. Refresh the page and try again.",
-                       "500.html")
+        return respond(400, "csrf_failed", "Session check failed",
+                       "Your session token is missing or expired. "
+                       "Go back, refresh the page and try again.", "400.html")
 
     @app.errorhandler(400)
     def bad_request(error):
-        return respond(400, "validation_error", "The request was invalid.", "500.html")
+        return respond(400, "validation_error", "Bad request",
+                       "The request could not be understood.", "400.html")
 
     @app.errorhandler(403)
     def forbidden(error):
-        return respond(403, "forbidden", "You do not have permission to do that.", "403.html")
+        return respond(403, "forbidden", "Access denied",
+                       "You do not have permission to view this page or perform this action.",
+                       "403.html")
 
     @app.errorhandler(404)
     def not_found(error):
-        return respond(404, "not_found", "The requested page or record was not found.", "404.html")
+        return respond(404, "not_found", "Page not found",
+                       "The page or record you asked for does not exist, "
+                       "or you are not allowed to see it.", "404.html")
 
     @app.errorhandler(405)
     def method_not_allowed(error):
-        return respond(405, "method_not_allowed", "That method is not allowed here.", "404.html")
+        return respond(405, "method_not_allowed", "Method not allowed",
+                       "That action is not supported on this page.", "404.html")
 
     @app.errorhandler(500)
     def server_error(error):
-        return respond(500, "server_error",
-                       "Something went wrong on our side. Please try again later.", "500.html")
+        return respond(500, "server_error", "Something went wrong",
+                       "An unexpected error occurred on our side. Please try again later.",
+                       "500.html")
