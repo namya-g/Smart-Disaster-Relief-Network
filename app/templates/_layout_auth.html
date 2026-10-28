@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% from "_macros.html" import brand_mark, flash_messages, disclaimer %}
+
+{% block body_class %}layout-auth{% endblock %}
+
+{% block body %}
+<main id="main" class="auth-layout" tabindex="-1">
+  <div class="auth-layout__inner">
+    <a class="brand brand--center" href="{{ url_for('pages.index') }}">
+      {{ brand_mark(36) }}<span class="brand__word">SDRN</span>
+    </a>
+    {{ flash_messages() }}
+    <div class="card auth-card">
+      {% block content %}{% endblock %}
+    </div>
+    {{ disclaimer() }}
+  </div>
+</main>
+{% endblock %}
