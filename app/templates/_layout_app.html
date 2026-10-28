@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% from "_macros.html" import icon, brand_mark, flash_messages, disclaimer, badge %}
+
+{% block body_class %}layout-app{% endblock %}
+
+{% block body %}
+<div class="app-shell">
+  <div class="sidebar" id="sidebar" data-collapsible="drawer">
+    <div class="sidebar__brand">
+      <a class="brand brand--light" href="{{ url_for('pages.dashboard') }}">
+        {{ brand_mark(32) }}<span class="brand__word">SDRN</span>
+      </a>
+    </div>
+    <nav class="sidebar__nav" aria-label="Main">
+      {% for item in nav_items %}
+        <a class="nav-link{% if item.active %} is-active{% endif %}" href="{{ item.href }}"
+           {%- if item.active %} aria-current="page"{% endif %}>
+          {{ icon(item.icon, 20) }}<span>{{ item.label }}</span>
+        </a>
+      {% endfor %}
+    </nav>
+    <p class="sidebar__footer">Academic prototype. Not monitored for real emergencies.</p>
+  </div>
+  <div class="nav-overlay" data-collapse-dismiss="sidebar" aria-hidden="true"></div>
+
+  <div class="app-main">
+    <header class="topbar">
+      <button type="button" class="icon-btn nav-toggle" data-collapse-toggle="sidebar"
+              aria-controls="sidebar" aria-expanded="false" aria-label="Open navigation menu">
+        {{ icon('menu', 22) }}
+      </button>
+
+      <div class="topbar__crumbs">{% block breadcrumbs %}{% endblock %}</div>
+
+      <div class="dropdown">
+        <button type="button" class="user-button" data-collapse-toggle="user-menu"
+                aria-controls="user-menu" aria-expanded="false">
+          <span class="avatar" aria-hidden="true">{{ current_user.full_name[:1]|upper }}</span>
+          <span class="user-button__name">{{ current_user.full_name }}</span>
+          {{ icon('chevron-down', 16) }}
+        </button>
+        <div class="dropdown-menu" id="user-menu" data-collapsible="dropdown">
+          <div class="dropdown-menu__header">
+            <strong>{{ current_user.full_name }}</strong>
+            <span class="text-muted text-sm">{{ current_user.email }}</span>
+            <span>{{ badge(current_user.role|capitalize, 'primary') }}</span>
+          </div>
+          <form method="post" action="{{ url_for('auth.logout') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="dropdown-menu__item">{{ icon('logout', 18) }}<span>Log out</span></button>
+          </form>
+        </div>
+      </div>
+    </header>
+
+    <main id="main" class="content" tabindex="-1">
+      {{ flash_messages() }}
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="app-footer">{{ disclaimer() }}</footer>
+  </div>
+</div>
+{% endblock %}
