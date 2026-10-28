@@ -6,6 +6,7 @@ from flask_wtf.csrf import CSRFError
 from jinja2 import TemplateNotFound
 
 from . import cli, db
+from . import api_dashboard  # noqa: F401  (attaches /api/dashboard to api_bp)
 from .api import api_bp
 from .auth import auth_bp
 from .config import Config
