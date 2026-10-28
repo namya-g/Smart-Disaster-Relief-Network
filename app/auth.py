@@ -30,12 +30,17 @@ def unauthorized():
     if request.path.startswith("/api/"):
         return api_error(401, "unauthenticated", "Please log in to continue.")
     flash("Please log in to continue.", "info")
-    return redirect(url_for("auth.login", next=request.path))
+    target = request.path
+    if request.query_string:
+        target += "?" + request.query_string.decode("utf-8", "replace")
+    return redirect(url_for("auth.login", next=target))
 
 
 def _safe_next(target):
     """Return target only if it is a local path (prevents open redirects)."""
     if not target or not target.startswith("/") or target.startswith("//") or "\\" in target:
+        return None
+    if any(ord(char) < 32 for char in target):
         return None
     parsed = urlparse(target)
     if parsed.scheme or parsed.netloc:
@@ -83,12 +88,14 @@ def login():
         return redirect(url_for("pages.dashboard"))
     next_url = _safe_next(request.values.get("next"))
     if request.method == "GET":
-        return render_template("login.html", errors={}, form={}, next=next_url)
+        expired = request.args.get("expired") == "1"
+        return render_template("login.html", errors={}, form={}, next=next_url, expired=expired)
 
     cleaned, errors = validate_login(request.form)
     form_values = {"email": cleaned["email"]}
     if errors:
-        return render_template("login.html", errors=errors, form=form_values, next=next_url), 400
+        return render_template("login.html", errors=errors, form=form_values,
+                               next=next_url, expired=False), 400
 
     user = models.get_user_by_email(cleaned["email"])
     password_ok = check_password_hash(user.password_hash if user else _DUMMY_HASH,
@@ -96,7 +103,8 @@ def login():
     if not user or not password_ok or not user.is_active:
         # Same message for every failure: don't reveal which part was wrong.
         generic = {"form": "Invalid email or password."}
-        return render_template("login.html", errors=generic, form=form_values, next=next_url), 401
+        return render_template("login.html", errors=generic, form=form_values,
+                               next=next_url, expired=False), 401
 
     session.clear()
     login_user(user)
