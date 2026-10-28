@@ -1,0 +1,192 @@
+{# SDRN reusable macros. Import what you need:
+   {% from "_macros.html" import icon, field %} #}
+
+{% macro icon(name, size=20, cls='') -%}
+<svg class="icon {{ cls }}" width="{{ size }}" height="{{ size }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+{%- if name == 'home' %}<path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>
+{%- elif name == 'list' %}<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/>
+{%- elif name == 'plus' %}<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+{%- elif name == 'map' %}<polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/>
+{%- elif name == 'box' %}<path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="M3 8l9 5 9-5"/><line x1="12" y1="13" x2="12" y2="21"/>
+{%- elif name == 'tent' %}<path d="M3 20 12 4l9 16z"/><path d="M12 20v-6"/>
+{%- elif name == 'users' %}<path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+{%- elif name == 'clipboard' %}<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/>
+{%- elif name == 'shield' %}<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+{%- elif name == 'logout' %}<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+{%- elif name == 'menu' %}<line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+{%- elif name == 'x' %}<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+{%- elif name == 'eye' %}<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/>
+{%- elif name == 'eye-off' %}<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>
+{%- elif name == 'check' %}<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>
+{%- elif name == 'alert' %}<path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+{%- elif name == 'info' %}<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+{%- elif name == 'chevron-down' %}<polyline points="6 9 12 15 18 9"/>
+{%- elif name == 'user' %}<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+{%- elif name == 'inbox' %}<polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>
+{%- elif name == 'arrow-right' %}<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+{%- elif name == 'refresh' %}<polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+{%- endif %}
+</svg>
+{%- endmacro %}
+
+
+{% macro brand_mark(size=32) -%}
+<svg class="brand__mark" width="{{ size }}" height="{{ size }}" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+  <rect width="32" height="32" rx="8" fill="#1D4ED8"/>
+  <path d="M16 7.5c-3.6 0-6.2 2.6-6.2 6 0 4.3 6.2 10.5 6.2 10.5s6.2-6.2 6.2-10.5c0-3.4-2.6-6-6.2-6z" fill="none" stroke="#fff" stroke-width="2"/>
+  <circle cx="16" cy="13.5" r="2.2" fill="#fff"/>
+</svg>
+{%- endmacro %}
+
+
+{% macro badge(label, tone='neutral') -%}
+<span class="badge badge--{{ tone }}"><span class="badge__dot" aria-hidden="true"></span>{{ label }}</span>
+{%- endmacro %}
+
+
+{# Request status badge. Labels/tones must match SDRN.labels / SDRN.tones in app.js #}
+{% macro status_badge(value) -%}
+{%- set labels = {'pending': 'Pending', 'approved': 'Approved', 'rejected': 'Rejected', 'assigned': 'Assigned', 'in_progress': 'In progress', 'resolved': 'Resolved', 'cancelled': 'Cancelled'} -%}
+{%- set tones = {'pending': 'warning', 'approved': 'primary', 'rejected': 'danger', 'assigned': 'info', 'in_progress': 'info', 'resolved': 'success', 'cancelled': 'neutral'} -%}
+{{ badge(labels.get(value, value), tones.get(value, 'neutral')) }}
+{%- endmacro %}
+
+
+{% macro priority_badge(value) -%}
+{%- set labels = {'low': 'Low', 'medium': 'Medium', 'high': 'High', 'critical': 'Critical'} -%}
+{%- set tones = {'low': 'neutral', 'medium': 'info', 'high': 'warning', 'critical': 'critical'} -%}
+{{ badge(labels.get(value, value), tones.get(value, 'neutral')) }}
+{%- endmacro %}
+
+
+{% macro alert(message, tone='info') -%}
+{%- set tone = tone if tone in ('success', 'warning', 'danger', 'info') else 'info' -%}
+<div class="alert alert--{{ tone }}" role="{{ 'alert' if tone == 'danger' else 'status' }}">
+  {{ icon({'success': 'check', 'danger': 'alert', 'warning': 'alert', 'info': 'info'}[tone], 20, 'alert__icon') }}
+  <p class="alert__text">{{ message }}</p>
+</div>
+{%- endmacro %}
+
+
+{% macro flash_messages(wrap=False) -%}
+{%- set messages = get_flashed_messages(with_categories=true) -%}
+{%- if messages -%}
+<div class="{{ 'container flash-stack' if wrap else 'flash-stack' }}">
+  {%- for category, message in messages -%}
+    {{ alert(message, 'danger' if category == 'error' else category) }}
+  {%- endfor -%}
+</div>
+{%- endif -%}
+{%- endmacro %}
+
+
+{% macro page_header(title, subtitle=None) -%}
+<div class="page-header">
+  <div class="page-header__text">
+    <h1 class="page-header__title">{{ title }}</h1>
+    {%- if subtitle %}<p class="page-header__subtitle">{{ subtitle }}</p>{% endif %}
+  </div>
+  {%- if caller is defined %}<div class="page-header__actions">{{ caller() }}</div>{% endif %}
+</div>
+{%- endmacro %}
+
+
+{# items: list of (label, href). Use None as href for the current page. #}
+{% macro breadcrumbs(items) -%}
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <ol>
+    {%- for label, href in items %}
+    <li>{% if href %}<a href="{{ href }}">{{ label }}</a>{% else %}<span aria-current="page">{{ label }}</span>{% endif %}</li>
+    {%- endfor %}
+  </ol>
+</nav>
+{%- endmacro %}
+
+
+{% macro disclaimer() -%}
+<p class="disclaimer"><strong>Academic prototype.</strong> SDRN is a student project. It is not monitored for real emergencies and must not be relied on to get emergency help. If you are in danger, contact your local emergency number.</p>
+{%- endmacro %}
+
+
+{# ---- Form fields -------------------------------------------------------
+   Every field renders: label, control, optional hint, and an error slot
+   (id "<id>-error", data-error-for="<name>") that app.js fills for
+   API validation errors. Extra HTML attributes: pass as keyword args,
+   underscores become hyphens (e.g. inputmode="numeric", data_x="1"). #}
+
+{% macro _label(id, label, required) -%}
+<label class="field__label" for="{{ id }}">{{ label }}
+  {%- if required %}<span class="field__asterisk" aria-hidden="true"> *</span>{% else %}<span class="field__optional"> (optional)</span>{% endif -%}
+</label>
+{%- endmacro %}
+
+{% macro _hint_and_error(id, name, hint, error) -%}
+{%- if hint %}<p class="field__hint" id="{{ id }}-hint">{{ hint }}</p>{% endif %}
+<p class="field__error" id="{{ id }}-error" data-error-for="{{ name }}"{% if not error %} hidden{% endif %}>{{ error or '' }}</p>
+{%- endmacro %}
+
+
+{% macro field(id, name, label, type='text', value='', required=True, hint=None, error=None, autocomplete=None, maxlength=None, placeholder=None) -%}
+<div class="field">
+  {{ _label(id, label, required) }}
+  <input class="input" id="{{ id }}" name="{{ name }}" type="{{ type }}" value="{{ value if value is not none else '' }}"
+    {%- if autocomplete %} autocomplete="{{ autocomplete }}"{% endif %}
+    {%- if maxlength %} maxlength="{{ maxlength }}"{% endif %}
+    {%- if placeholder %} placeholder="{{ placeholder }}"{% endif %}
+    {%- if required %} required{% endif %}
+    {%- if error %} aria-invalid="true"{% endif %}
+    aria-describedby="{{ id }}-error{% if hint %} {{ id }}-hint{% endif %}"
+    {%- for k, v in kwargs.items() %} {{ k|replace('_', '-') }}="{{ v }}"{% endfor %}>
+  {{ _hint_and_error(id, name, hint, error) }}
+</div>
+{%- endmacro %}
+
+
+{% macro password_field(id, name, label, autocomplete='current-password', required=True, hint=None, error=None) -%}
+<div class="field">
+  {{ _label(id, label, required) }}
+  <div class="input-group">
+    <input class="input input--with-action" id="{{ id }}" name="{{ name }}" type="password"
+      autocomplete="{{ autocomplete }}" maxlength="128"
+      {%- if required %} required{% endif %}
+      {%- if error %} aria-invalid="true"{% endif %}
+      aria-describedby="{{ id }}-error{% if hint %} {{ id }}-hint{% endif %}">
+    <button type="button" class="input-group__action" data-password-toggle aria-controls="{{ id }}" aria-pressed="false" aria-label="Show password">
+      {{ icon('eye', 20, 'icon-show') }}{{ icon('eye-off', 20, 'icon-hide') }}
+    </button>
+  </div>
+  {{ _hint_and_error(id, name, hint, error) }}
+</div>
+{%- endmacro %}
+
+
+{# options: list of (value, label) #}
+{% macro select_field(id, name, label, options, selected=None, required=True, hint=None, error=None, placeholder=None) -%}
+<div class="field">
+  {{ _label(id, label, required) }}
+  <select class="select" id="{{ id }}" name="{{ name }}"
+    {%- if required %} required{% endif %}
+    {%- if error %} aria-invalid="true"{% endif %}
+    aria-describedby="{{ id }}-error{% if hint %} {{ id }}-hint{% endif %}">
+    {%- if placeholder %}<option value=""{% if not selected %} selected{% endif %}>{{ placeholder }}</option>{% endif %}
+    {%- for opt_value, opt_label in options %}
+    <option value="{{ opt_value }}"{% if opt_value == selected %} selected{% endif %}>{{ opt_label }}</option>
+    {%- endfor %}
+  </select>
+  {{ _hint_and_error(id, name, hint, error) }}
+</div>
+{%- endmacro %}
+
+
+{% macro textarea_field(id, name, label, value='', required=True, hint=None, error=None, maxlength=None, rows=5, placeholder=None) -%}
+<div class="field">
+  {{ _label(id, label, required) }}
+  <textarea class="textarea" id="{{ id }}" name="{{ name }}" rows="{{ rows }}"
+    {%- if maxlength %} maxlength="{{ maxlength }}"{% endif %}
+    {%- if placeholder %} placeholder="{{ placeholder }}"{% endif %}
+    {%- if required %} required{% endif %}
+    {%- if error %} aria-invalid="true"{% endif %}
+    aria-describedby="{{ id }}-error{% if hint %} {{ id }}-hint{% endif %}">{{ value or '' }}</textarea>
+  {{ _hint_and_error(id, name, hint, error) }}
+</div>
+{%- endmacro %}
