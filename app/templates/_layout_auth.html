@@ -17,3 +17,12 @@
   </div>
 </main>
 {% endblock %}
+
+{% block scripts %}
+<script>
+  (function () {
+    var invalid = document.querySelector('[aria-invalid="true"]');
+    if (invalid) { invalid.focus(); }
+  })();
+</script>
+{% endblock %}
