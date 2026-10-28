@@ -1,47 +1,32 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Log in - SDRN</title>
-</head>
-<body>
-  <main>
-    <h1>Log in to SDRN</h1>
-    <p><em>Temporary unstyled page. Replaced in Phase 4.</em></p>
+{% extends "_layout_auth.html" %}
+{% from "_macros.html" import field, password_field, alert %}
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% for category, message in messages %}
-        <p role="status">{{ message }}</p>
-      {% endfor %}
-    {% endwith %}
+{% block title %}Log in - SDRN{% endblock %}
 
-    {% if errors.get('form') %}
-      <p role="alert">{{ errors['form'] }}</p>
-    {% endif %}
+{% block content %}
+  <h1 class="auth-card__title">Log in</h1>
+  <p class="auth-card__intro">Sign in to your SDRN account.</p>
 
-    <form method="post" action="{{ url_for('auth.login') }}" novalidate>
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+  {% if expired %}
+    <div class="form-error">{{ alert('Your session has expired. Please log in again.', 'warning') }}</div>
+  {% endif %}
+  {% if errors.get('form') %}
+    <div class="form-error">{{ alert(errors['form'], 'danger') }}</div>
+  {% endif %}
 
-      <p>
-        <label for="email">Email</label><br>
-        <input id="email" name="email" type="email" autocomplete="email" required
-               value="{{ form.get('email', '') }}">
-        {% if errors.get('email') %}<br><span role="alert">{{ errors['email'] }}</span>{% endif %}
-      </p>
+  <form method="post" action="{{ url_for('auth.login') }}" novalidate data-loading-form>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
 
-      <p>
-        <label for="password">Password</label><br>
-        <input id="password" name="password" type="password" autocomplete="current-password" required>
-        {% if errors.get('password') %}<br><span role="alert">{{ errors['password'] }}</span>{% endif %}
-      </p>
+    {{ field('email', 'email', 'Email address', type='email', value=form.get('email', ''),
+             autocomplete='email', maxlength=254, error=errors.get('email'),
+             autocapitalize='off', spellcheck='false') }}
 
-      <button type="submit">Log in</button>
-    </form>
+    {{ password_field('password', 'password', 'Password', autocomplete='current-password',
+                      error=errors.get('password')) }}
 
-    <p>No account? <a href="{{ url_for('auth.register') }}">Register</a></p>
-    <p><small>Academic prototype. Not monitored for real emergencies. Do not rely on it to get emergency help.</small></p>
-  </main>
-</body>
-</html>
+    <button type="submit" class="btn btn--primary btn--block" data-loading-text="Logging in&hellip;">Log in</button>
+  </form>
+
+  <p class="auth-card__switch">No account yet? <a href="{{ url_for('auth.register') }}">Register</a></p>
+{% endblock %}
