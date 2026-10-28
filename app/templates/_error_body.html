@@ -1,0 +1,9 @@
+<div class="error-page">
+  <p class="error-page__code">Error {{ error_status|default('') }}</p>
+  <h1 class="error-page__title">{{ error_title|default('Something went wrong') }}</h1>
+  <p class="error-page__text">{{ error_message|default('Please go back and try again.') }}</p>
+  <div class="cluster" style="justify-content: center;">
+    <a class="btn btn--primary" href="{{ url_for('pages.index') }}">Go to home page</a>
+    <a class="btn btn--secondary" href="{{ url_for('pages.dashboard') }}">Go to dashboard</a>
+  </div>
+</div>
