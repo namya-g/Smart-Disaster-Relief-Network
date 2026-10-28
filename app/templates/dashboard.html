@@ -1,19 +1,61 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Dashboard - SDRN</title>
-</head>
-<body>
-  <main>
-    <h1>Dashboard</h1>
-    <p><em>Temporary page. Replaced in Phase 9.</em></p>
-    <p>Logged in as {{ current_user.full_name }} ({{ current_user.role }}).</p>
-    <form method="post" action="{{ url_for('auth.logout') }}">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      <button type="submit">Log out</button>
-    </form>
-  </main>
-</body>
-</html>
+{% extends "_layout_app.html" %}
+{% from "_macros.html" import page_header, breadcrumbs, badge, status_badge, priority_badge %}
+
+{% block title %}Dashboard - SDRN{% endblock %}
+
+{% block breadcrumbs %}{{ breadcrumbs([('Dashboard', None)]) }}{% endblock %}
+
+{% block content %}
+  {% call page_header('Dashboard', 'Welcome, ' ~ current_user.full_name ~ '. This page is temporary.') %}
+    <a class="btn btn--primary" href="{{ url_for('pages.dashboard') }}">Primary action</a>
+  {% endcall %}
+
+  <div class="grid grid--2">
+    <section class="card" aria-labelledby="me-title">
+      <div class="card__header">
+        <h2 class="card__title" id="me-title">Your account (from /api/me)</h2>
+        <button type="button" class="btn btn--secondary btn--sm" id="demo-reload">Reload</button>
+      </div>
+      <div id="demo-me"></div>
+    </section>
+
+    <section class="card" aria-labelledby="badges-title">
+      <h2 class="card__title" id="badges-title">Badges</h2>
+      <p class="text-muted text-sm">Status is always shown as text as well as colour.</p>
+      <div class="cluster">
+        {{ status_badge('pending') }} {{ status_badge('approved') }} {{ status_badge('rejected') }}
+        {{ status_badge('assigned') }} {{ status_badge('in_progress') }} {{ status_badge('resolved') }}
+        {{ status_badge('cancelled') }}
+      </div>
+      <div class="cluster" style="margin-top: 12px;">
+        {{ priority_badge('low') }} {{ priority_badge('medium') }} {{ priority_badge('high') }} {{ priority_badge('critical') }}
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="actions-title">
+      <h2 class="card__title" id="actions-title">Buttons, toasts and dialog</h2>
+      <div class="cluster">
+        <button type="button" class="btn btn--primary" id="demo-toast-success">Success toast</button>
+        <button type="button" class="btn btn--secondary" id="demo-toast-error">Error toast</button>
+        <button type="button" class="btn btn--danger" id="demo-confirm">Confirm dialog</button>
+        <button type="button" class="btn btn--primary" id="demo-loading">Loading button</button>
+        <button type="button" class="btn btn--secondary" disabled>Disabled</button>
+        <button type="button" class="btn btn--ghost">Ghost</button>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="states-title">
+      <h2 class="card__title" id="states-title">Data states</h2>
+      <div class="cluster" style="margin-bottom: 16px;">
+        <button type="button" class="btn btn--secondary btn--sm" data-demo-state="loading">Loading</button>
+        <button type="button" class="btn btn--secondary btn--sm" data-demo-state="empty">Empty</button>
+        <button type="button" class="btn btn--secondary btn--sm" data-demo-state="error">Error</button>
+      </div>
+      <div id="demo-states"></div>
+    </section>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/dashboard.js') }}" defer></script>
+{% endblock %}
