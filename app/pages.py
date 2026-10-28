@@ -1,5 +1,5 @@
 """HTML page routes and shared template context."""
-from flask import Blueprint, current_app, redirect, render_template, request, url_for
+from flask import Blueprint, current_app, render_template, request, url_for
 from flask_login import current_user, login_required
 
 from .permissions import ADMINISTRATOR, CITIZEN, VOLUNTEER
@@ -55,9 +55,7 @@ def inject_navigation():
 
 @pages_bp.get("/")
 def index():
-    if current_user.is_authenticated:
-        return redirect(url_for("pages.dashboard"))
-    return redirect(url_for("auth.login"))
+    return render_template("index.html")
 
 
 @pages_bp.get("/dashboard")
