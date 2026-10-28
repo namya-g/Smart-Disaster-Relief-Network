@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% from "_macros.html" import icon, brand_mark, flash_messages, disclaimer %}
+
+{% block body_class %}layout-public{% endblock %}
+
+{% block body %}
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a class="brand" href="{{ url_for('pages.index') }}">
+      {{ brand_mark(32) }}<span class="brand__word">SDRN</span>
+    </a>
+
+    <button type="button" class="icon-btn site-header__toggle" data-collapse-toggle="public-nav"
+            aria-controls="public-nav" aria-expanded="false" aria-label="Toggle navigation menu">
+      {{ icon('menu', 22) }}
+    </button>
+
+    <nav class="site-nav" id="public-nav" data-collapsible="panel" aria-label="Main">
+      <ul class="site-nav__links">
+        <li><a href="{{ url_for('pages.index') }}#features">Features</a></li>
+        <li><a href="{{ url_for('pages.index') }}#how-it-works">How it works</a></li>
+        <li><a href="{{ url_for('pages.index') }}#about">About</a></li>
+      </ul>
+      <div class="site-nav__actions">
+        {% if current_user.is_authenticated %}
+          <a class="btn btn--primary" href="{{ url_for('pages.dashboard') }}">Go to dashboard</a>
+        {% else %}
+          <a class="btn btn--secondary" href="{{ url_for('auth.login') }}">Log in</a>
+          <a class="btn btn--primary" href="{{ url_for('auth.register') }}">Register</a>
+        {% endif %}
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main id="main" tabindex="-1">
+  {{ flash_messages(wrap=True) }}
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <div>
+      <a class="brand" href="{{ url_for('pages.index') }}">{{ brand_mark(28) }}<span class="brand__word">SDRN</span></a>
+      <p class="site-footer__tagline">Smart Disaster Relief Network, a B.Tech Mini Project Lab demonstration.</p>
+    </div>
+    <ul class="site-footer__links">
+      <li><a href="{{ url_for('pages.index') }}#features">Features</a></li>
+      <li><a href="{{ url_for('pages.index') }}#how-it-works">How it works</a></li>
+      {% if not current_user.is_authenticated %}
+        <li><a href="{{ url_for('auth.login') }}">Log in</a></li>
+        <li><a href="{{ url_for('auth.register') }}">Register</a></li>
+      {% endif %}
+    </ul>
+  </div>
+  <div class="container">{{ disclaimer() }}</div>
+</footer>
+{% endblock %}
